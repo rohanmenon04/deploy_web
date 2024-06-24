@@ -44,8 +44,8 @@ def serve_static_files(filename):
 
 @app.route('/leaderboard')
 def serve_leaderboard():
-    backend_url_all_time = 'http://backend-service:8080/api/leaderboard-all-time'
-    backend_url_24h = 'http://backend-service:8080/api/leaderboard-24h'
+    backend_url_all_time = 'http://backend-service:10000/api/leaderboard-all-time'
+    backend_url_24h = 'http://backend-service:10000/api/leaderboard-24h'
     
     try:
         leaderboard_response_all_time = requests.get(backend_url_all_time)
@@ -64,7 +64,7 @@ def serve_pl_guide():
 
 @app.route('/per-stats')
 def serve_per_stats():
-    backend_url = 'http://backend-service:8080/api/get-graph-data'
+    backend_url = 'http://backend-service:10000/api/get-graph-data'
     response = requests.get(backend_url)
     data = response.json()
     return render_template('per-stats.html', chart_data=data)
@@ -76,13 +76,13 @@ def serve_game():
 
 @app.route('/api/chat', methods=['POST'])
 def proxy_chat():
-    backend_url = 'http://backend-service:8080/api/chat'
+    backend_url = 'http://backend-service:10000/api/chat'
     response = requests.post(backend_url, json=request.json)
     return (response.content, response.status_code, response.headers.items())
 
 @app.route('/save_playerdata', methods=['POST'])
 def proxy_save_playerdata():
-    backend_url = 'http://backend-service:8080/save_playerdata'  # Change to the correct URL and port of your backend server
+    backend_url = 'http://backend-service:10000/save_playerdata'  # Change to the correct URL and port of your backend server
     try:
         # Forward the request to the backend server
         response = requests.post(backend_url, json=request.get_json())
@@ -98,7 +98,7 @@ def proxy_delete_score():
     if not score_to_delete:
         return jsonify({"error": "No score provided"}), 400
     
-    backend_url = 'http://backend-service:8080/api/delete-score'  # Replace with your backend URL
+    backend_url = 'http://backend-service:10000/api/delete-score'  # Replace with your backend URL
 
     # Forward the request to the backend
     response = requests.post(backend_url, json={'score': score_to_delete})

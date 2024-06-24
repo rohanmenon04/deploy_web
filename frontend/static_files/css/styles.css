@@ -1,0 +1,327 @@
+:root {
+    --home-bg-color: #000000; /* Black background color */
+    --menu-bg-color: #5F1873; /* Purple menu background color */
+    --text-color: #ffffff; /* White text color */
+    --border-color: #ffffff; /* White border color */
+    --box-shadow-color: rgba(0, 0, 0, 0.1); /* Light box shadow */
+    --light-purple: #5F1873; /* Purple light green */
+    --dark-purple: #000000; /* Dark purple */
+    --box-shadow: 0px 0px 3px 5px var(--box-shadow-color); /* Box shadow with light color */
+    --border-radius: 60px 5px; /* Border radius */
+}
+
+body, html {
+    color: var(--text-color);
+    background-color: var(--home-bg-color);
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif; /* Added Montserrat font */
+    font-size: 1rem; /* Base font size */
+}
+
+a {
+    color: white;      /* Set the link color to white */
+    text-decoration: underline;  /* Underline the link */
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center; /* Center text within the header */
+    width: 100%; /* Ensure the header takes the full width */
+    color: var(--text-color); /* Ensure text color is white */
+    padding: 2vh 1vw; /* Add padding for spacing */
+    box-sizing: border-box; /* Include padding in width and height calculations */
+    position: fixed; /* Fix the header at the top */
+    top: 0; /* Align the header to the top */
+}
+
+/* Specific elements can also be updated if needed */
+.ham-menu > ul > li {
+    font-family: 'Montserrat', sans-serif; /* Added Montserrat font */
+    font-size: 0.8rem; /* Adjusted font size */
+    white-space: nowrap;
+    letter-spacing: 0.015em; /* Adjusted letter spacing */
+    cursor: pointer;
+    color: var(--text-color); /* Ensure the text color is white */
+    text-align: left; /* Align text to the left */
+    padding: 1vh 0; /* Adjust padding to bring items closer */
+    margin: 0; /* Ensure no extra margin */
+    line-height: 1.2; /* Adjust line height to bring items closer vertically */
+    opacity: 0; /* Initially hidden */
+    transform: translateX(-8vw); /* Slide in effect */
+    transition: opacity 0.5s ease, transform 0.5s ease; /* Smooth transition */
+}
+
+.partitioned {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start; /* Align the sections to the start (left) */
+    padding: 10vh 5vw;
+    width: calc(100% - 60px);
+    margin: 0 auto; /* Center the container */
+}
+
+.partitioned-section {
+    flex: 1 1 45%; /* Allows sections to grow and shrink, adjust as needed */
+    color: var(--text-color);
+    padding: 2vh 1vw;
+    box-sizing: border-box;
+    margin: 1vh 1vw;
+    box-shadow: var(--box-shadow); /* Box shadow with light color */
+    border-radius: 1vh; /* Border radius */
+}
+
+.leaderboards {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2vh 0;
+    font-size: 1.2em;
+    font-family: 'Montserrat', sans-serif; /* Use Montserrat font */
+    box-shadow: 0 0 1vh rgba(0, 0, 0, 0.1);
+}
+
+.leaderboards thead tr {
+    background-color: var(--menu-bg-color);
+    color: var(--text-color);
+    text-align: left;
+    font-weight: bold;
+}
+
+.leaderboards th, .leaderboards td {
+    padding: 1.2vh 1.5vw;
+    border: 0.1vh solid #ddd;
+}
+
+.leaderboards tbody tr {
+    border-bottom: 0.1vh solid #ddd;
+}
+
+.leaderboards tbody tr:nth-of-type(even) {
+    background-color: var(--light-purple);
+}
+
+.leaderboards tbody tr:last-of-type {
+    border-bottom: 0.2vh solid var(--menu-bg-color);
+}
+
+.leaderboards tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+}
+
+h2 {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--text-color);
+    text-align: center;
+    margin-bottom: 2vh;
+}
+
+#ham-menu {
+    display: none;
+}
+
+label[for="ham-menu"] {
+    display: block;
+    position: fixed;
+    top: 2.4vh;
+    left: 2vw;
+    z-index: 999;
+    width: 6vw;
+    height: 6vw;
+    max-width: 60px;
+    max-height: 60px;
+    background-color: var(--home-bg-color);
+    border-radius: 1.5vh;
+    border: 0.2vh solid var(--border-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+label[for="ham-menu"] .icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+label[for="ham-menu"] .menu-icon {
+    font-size: 1.5em;
+    color: var(--border-color);
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+label[for="ham-menu"] .home-icon {
+    display: none;
+    font-size: 1.75em;
+    color: var(--border-color);
+    position: absolute;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    transition-delay: 0.5s; /* Add delay to match the menu icon's transition duration */
+    opacity: 0;
+    transform: scale(0);
+}
+
+@keyframes homeIconSpin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+label[for="ham-menu"]:hover .menu-icon {
+    transform: rotate(360deg);
+    opacity: 0;
+}
+
+label[for="ham-menu"]:hover .home-icon {
+    display: block;
+    transition-delay: 0s; /* Ensure there's no delay in becoming visible */
+    opacity: 1;
+    transform: scale(1);
+    animation: homeIconSpin 0.5s ease; /* Spin the home icon */
+}
+
+/* Ensure background stays black when hovering over label or menu */
+label[for="ham-menu"]:hover ~ .full-page-green,
+.ham-menu:hover ~ .full-page-green,
+.full-page-green:hover {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    background-color: var(--dark-purple); /* Ensure background stays black */
+}
+
+label[for="ham-menu"]:hover ~ .ham-menu,
+.ham-menu:hover {
+    transform: translate(0);
+    visibility: visible;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+label[for="ham-menu"]:not(:hover) ~ .ham-menu,
+.ham-menu:not(:hover) {
+    transform: translate(-110%);
+    visibility: hidden;
+    transition: transform 1s ease, visibility 1s ease;
+}
+
+.full-page-green {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--dark-purple); /* Updated variable name */
+    z-index: 997;
+    opacity: 0;
+    visibility: hidden;
+    display: none;
+    transition: 500ms;
+}
+
+.ham-menu {
+    width: 25vw; /* Adjusted width */
+    height: 100%;
+    position: fixed;
+    top: 0;
+    visibility: hidden;
+    transform: translate(-110%);
+    z-index: 998;
+    background-color: var(--light-purple); /* Updated variable name */
+    transition: transform 0.5s ease-in-out, visibility 0.5s ease-in-out; /* Adjusted speed for both transform and visibility */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align items to the top */
+}
+
+.ham-menu > ul {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start; /* Align items to the start (top) */
+    padding: 10px 20px; /* Adjust padding */
+    height: 100%;
+    list-style-type: none; /* Removed bullet points */
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease; /* Add transform transition */
+    transform: translateX(-100%); /* Initial state hidden */
+}
+
+#ham-menu:checked ~ .ham-menu > ul,
+label[for="ham-menu"]:hover ~ .ham-menu > ul,
+.ham-menu:hover > ul {
+    opacity: 1;
+    transform: translateX(0); /* Slide in when hovered */
+}
+
+.ham-menu > ul > li {
+    font-size: 2rem; /* Adjusted font size */
+    white-space: nowrap;
+    letter-spacing: 0.015em; /* Reduced letter spacing further */
+    cursor: pointer;
+    color: var(--text-color); /* Ensure the text color is white */
+    text-align: left; /* Align text to the left */
+    padding: 5vh 0; /* Adjust padding to bring items closer */
+    margin: 0; /* Ensure no extra margin */
+    line-height: 1.2; /* Adjust line height to bring items closer vertically */
+    opacity: 0; /* Initially hidden */
+    transform: translateX(-5vw); /* Slide in effect */
+    transition: opacity 0.5s ease, transform 0.5s ease; /* Smooth transition */
+}
+
+.ham-menu > ul {
+    padding: 20vh; /* Ensure no padding around the list */
+    margin: 0; /* Ensure no margin around the list */
+    list-style: none; /* Remove bullet points */
+}
+
+#ham-menu:checked ~ .ham-menu > ul > li,
+label[for="ham-menu"]:hover ~ .ham-menu > ul > li,
+.ham-menu:hover > ul > li {
+    opacity: 1; /* Fully visible */
+    transform: translateX(0); /* Slide in */
+}
+
+@media screen and (max-width: 600px) {
+    .partitioned-section {
+        flex: 1 1 100%; /* Full width on small screens */
+    }
+
+    .ham-menu {
+        width: 70vw; /* Adjusted width for small screens */
+    }
+
+    label[for="ham-menu"] {
+        width: 8vw;
+        height: 8vw;
+        max-width: 40px;
+        max-height: 40px;
+    }
+
+    label[for="ham-menu"] .menu-icon,
+    label[for="ham-menu"] .home-icon {
+        font-size: 1.2em;
+    }
+
+    .ham-menu > ul > li {
+        font-size: 1.5rem; /* Adjusted font size */
+        padding: 5vh 0; /* Adjust padding */
+    }
+
+    .header {
+        padding: 1vh 1vw; /* Adjust padding */
+    }
+
+    .partitioned {
+        padding: 5vh 2vw; /* Adjust padding */
+    }
+}

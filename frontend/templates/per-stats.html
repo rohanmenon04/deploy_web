@@ -1,0 +1,160 @@
+{% extends "layout.html" %}
+
+{% block title %}Personal Statistics - Lines{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function deleteRow(score) {
+            // alert("[HTML FILE]")
+            // AJAX request to call backend function
+            fetch('/api/delete-score', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ score: score }),  // Send score as JSON
+                
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+    <style>
+        body {
+            background-color: black; /* Set background color */
+            color: white; /* Set text color */
+        }
+        .content-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding-top: 50px; /* Add padding to move content down */
+        }
+        .partitioned-section {
+            flex: 1;
+            min-width: 300px;
+            margin-top: 20px; /* Add margin to individual sections for extra spacing */
+        }
+        .leaderboards {
+            width: 100%;
+        }
+        .delete-button {
+            background-color: transparent;
+            color: grey;
+            border: none;
+            padding: 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            position: relative;
+            right: 0;
+        }
+        .delete-button:hover {
+            background-color: white;
+        }
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="content-wrapper">
+        <!-- Personal Leaderboard Section -->
+        <div class="partitioned-section">
+            <h2>Personal Leaderboard</h2>
+            <p>In the section below you can view your personal best performances</p>
+            <table class="leaderboards">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Performance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for score in chart_data['values'][:5] %}
+                    <tr>
+                        <td>{{ loop.index }}</td> <!-- Use loop.index for numbering -->
+                        <td class="flex-container">{{ score }} <button class="delete-button" onclick="deleteRow('{{ score }}')">Delete</button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Performance Over Last 10 Games Section -->
+        <div class="partitioned-section">
+            <h2>Performance over last 10 games</h2>
+            <p>Performance over the last 10 games:</p>
+            <canvas id="performanceChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Performance comparison section -->
+    <div class="partitioned-section">
+        <h2>Performance in perspective</h2>
+        <p>Here we will show some player statistics compared to other players: for instance
+            the variance in a player's average performance, the average performance of
+            the last 10 games compared to others and more.</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chartData = {{ chart_data | tojson | safe }};
+            // Chart.js setup
+            var ctx = document.getElementById('performanceChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,  // Use times as labels
+                    datasets: [{
+                        label: 'Performance',
+                        data: chartData.values,  // Use scores as data points
+                        borderColor: 'rgba(255, 255, 255, 1)', // White border color
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)', // White background color
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: 'white' // Set y-axis label color to white
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: 'white' // Set x-axis label color to white
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'white' // Set legend label color to white
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>  
+{% endblock %}
+
+{% block menu %}
+    {{ super() }}
+{% endblock %}
+
+{% block scripts %}
+    <script src="/static/js/scripts.js"></script>
+{% endblock %}

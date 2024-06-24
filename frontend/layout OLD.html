@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Lines - The Game{% endblock %}</title>
+    <link rel="stylesheet" href="styles.css">
+    {% endblock %}
+</head>
+<body>
+    <div class="header">
+        <h1><strong><em>Lines - The Game</em></strong></h1>
+    </div>
+
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <div class="footer">
+        {% block footer %}
+        <div class="foot section">
+            <h3>Socials</h3>
+            <ul>
+                <li>Instagram: <a href="https://www.instagram.com/the_game_lines/">the_game_lines</a></li>
+                <li>X: <a href="https://x.com/linethegame">linethegame</a></li>
+            </ul>
+        </div>
+        <div class="foot section">
+            <h3>Contact</h3>
+            <p>Email: Info@Lines-The-Game.com</p>
+            <a href="pl-guide.html">Player Guide</a>
+        </div>
+        <div class="foot section">
+            <h3>About</h3>
+            <p>The game is yayayyayayayyaya</p>
+        </div>
+        {% endblock %}
+    </div>
+</body>
+</html>

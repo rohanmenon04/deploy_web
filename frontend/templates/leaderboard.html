@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+
+{% block title %}Leaderboard - Lines{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: black; /* Set background color */
+            color: white; /* Set text color */
+        }
+        .partitioned {
+            display: flex;
+            justify-content: space-between; /* Adjust for equal spacing */
+            padding: 20px; /* Adjust as necessary for spacing */
+            margin-top: 50px;
+        }
+        .partitioned-section {
+            flex: 1;
+            margin: 10px; /* Adjust for spacing between sections */
+        }
+        .leaderboards {
+            width: 100%;
+            border-collapse: collapse; /* Ensure table borders collapse */
+        }
+        .leaderboards th, .leaderboards td {
+            border: 1px solid white; /* Table borders */
+            padding: 8px; /* Cell padding */
+            text-align: left; /* Align text */
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="partitioned">
+    <div class="partitioned-section">
+        <h2>Best performances of all time!</h2>
+        <table class="leaderboards">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Performance</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in all_time_leaderboard[:10] %}
+                <tr>
+                    <td>{{ loop.index }}</td> <!-- loop.index for automatic numbering -->
+                    <td>{{ entry.name }}</td>
+                    <td>{{ entry.score }}</td>
+                    <td>{{ entry.date }}</td> <!-- Assuming 'date' is a field, if not adjust accordingly -->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="partitioned-section">
+        <h2>Best performances in 24h</h2>
+        <table class="leaderboards">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Performance</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in leaderboard_data_24h[:10] %}
+                <tr>
+                    <td>{{ loop.index }}</td> <!-- loop.index for automatic numbering -->
+                    <td>{{ entry.name }}</td>
+                    <td>{{ entry.score }}</td>
+                    <td>{{ entry.date }}</td> <!-- Assuming 'date' is a field, if not adjust accordingly -->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block menu %}
+    <input type="checkbox" id="ham-menu">
+    <label for="ham-menu">
+        <div class="icon-container">
+            <i class="fas fa-bars menu-icon"></i>
+            <i class="fas fa-home home-icon" id="homeIcon"></i>
+        </div>
+    </label>
+    <div class="full-page-green"></div>
+    <div class="ham-menu">
+        <ul class="centre-text bold-text">
+            <li id="menuHome">Home</li>
+            <li id="menuPlayNow">Play Now</li>
+            <li id="menuPersonalStats">Personal Statistics</li>
+            <li id="menuPlayerGuide">Player Guide</li>
+        </ul>
+    </div>
+    <script src="/static/js/scripts.js"></script>
+{% endblock %}

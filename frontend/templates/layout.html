@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Lines - The Game{% endblock %}</title>
+        <link rel="stylesheet" href="/static/css/styles.css">
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    {% endblock %}
+</head>
+<body>
+    {% block header %}
+        <div class="header">
+            <h1 id="gameTitle"><strong><em>Lines - The Game</em></strong></h1>
+        </div>
+    {% endblock %}
+
+    {% block content %}
+    {% endblock %}
+
+    {% block menu %}
+        <label for="ham-menu">
+            <div class="icon-container">
+                <i class="fas fa-bars menu-icon"></i>
+                <i class="fas fa-home home-icon" id="homeIcon"></i> <!-- Changed "fal" to "fas" -->
+            </div>
+        </label>
+        <div class="full-page-green"></div>
+        <div class="ham-menu">
+            <ul class="centre-text bold-text">
+                <li id="menuPlayNow">Play Now</li>
+                <li id="menuLeaderboard">Leaderboard</li>
+                <li id="menuPersonalStats">Personal Statistics</li>
+                <li id="menuPlayerGuide">Player Guide</li>
+            </ul>
+        </div>
+        <script src="/static/js/scripts.js"></script>
+    {% endblock %}
+</body>
+</html>

@@ -1,4 +1,3 @@
-# Need to install pip install Flask flask-compress pyOpenSSL
 from flask import Flask, send_from_directory, render_template, request, jsonify, make_response
 from flask_compress import Compress
 import ssl
@@ -45,24 +44,29 @@ def serve_static_files(filename):
 
 @app.route('/leaderboard')
 def serve_leaderboard():
-    leaderboard_response_all_time = requests.get('http://127.0.0.1:8080/api/leaderboard-all-time')
-    leaderboard_data_all_time = leaderboard_response_all_time.json()
-    time.sleep(1.01)
-    leaderboard_response_24h = requests.get('http://127.0.0.1:8080/api/leaderboard-24h')
-    leaderboard_data_24h = leaderboard_response_24h.json()
-    print (leaderboard_data_24h)
-    return render_template('leaderboard.html', all_time_leaderboard=leaderboard_data_all_time, leaderboard_data_24h=leaderboard_data_24h)
+    backend_url_all_time = 'http://backend-service:5000/api/leaderboard-all-time'
+    backend_url_24h = 'http://backend-service:5000/api/leaderboard-24h'
+    
+    try:
+        leaderboard_response_all_time = requests.get(backend_url_all_time)
+        leaderboard_data_all_time = leaderboard_response_all_time.json()
+        
+        leaderboard_response_24h = requests.get(backend_url_24h)
+        leaderboard_data_24h = leaderboard_response_24h.json()
+        
+        return render_template('leaderboard.html', all_time_leaderboard=leaderboard_data_all_time, leaderboard_data_24h=leaderboard_data_24h)
+    except requests.exceptions.RequestException as e:
+        return str(e), 500
 
 @app.route('/pl-guide') 
 def serve_pl_guide():
     return render_template('pl-guide.html')
 
-
 @app.route('/per-stats')
 def serve_per_stats():
-    backend_url = 'http://127.0.0.1:8080/api/get-graph-data'
-    respnsone = requests.get(backend_url)
-    data = respnsone.json()
+    backend_url = 'http://backend-service:5000/api/get-graph-data'
+    response = requests.get(backend_url)
+    data = response.json()
     return render_template('per-stats.html', chart_data=data)
 
 # Route to serve the game
@@ -72,13 +76,13 @@ def serve_game():
 
 @app.route('/api/chat', methods=['POST'])
 def proxy_chat():
-    backend_url = 'http://127.0.0.1:8080/api/chat'
+    backend_url = 'http://backend-service:5000/api/chat'
     response = requests.post(backend_url, json=request.json)
     return (response.content, response.status_code, response.headers.items())
 
 @app.route('/save_playerdata', methods=['POST'])
 def proxy_save_playerdata():
-    backend_url = 'http://127.0.0.1:8080/save_playerdata'  # Change to the correct URL and port of your backend server
+    backend_url = 'http://backend-service:5000/save_playerdata'  # Change to the correct URL and port of your backend server
     try:
         # Forward the request to the backend server
         response = requests.post(backend_url, json=request.get_json())
@@ -94,7 +98,7 @@ def proxy_delete_score():
     if not score_to_delete:
         return jsonify({"error": "No score provided"}), 400
     
-    backend_url = 'http://127.0.0.1:8080/api/delete-score'  # Replace with your backend URL
+    backend_url = 'http://backend-service:5000/api/delete-score'  # Replace with your backend URL
 
     # Forward the request to the backend
     response = requests.post(backend_url, json={'score': score_to_delete})

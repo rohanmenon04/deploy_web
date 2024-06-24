@@ -1,0 +1,5 @@
+Flask==2.3.3
+Flask-Compress==1.15
+requests==2.31.0
+Flask-Cors==4.0.1
+matplotlib==3.7.1

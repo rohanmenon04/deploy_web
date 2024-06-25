@@ -44,8 +44,8 @@ def serve_static_files(filename):
 
 @app.route('/leaderboard')
 def serve_leaderboard():
-    backend_url_all_time = 'http://backend-service:10000/api/leaderboard-all-time'
-    backend_url_24h = 'http://backend-service:10000/api/leaderboard-24h'
+    backend_url_all_time = ''https://backend-service-fag8.onrender.com/api/leaderboard-all-time'
+    backend_url_24h = ''https://backend-service-fag8.onrender.com/api/leaderboard-24h'
     
     try:
         leaderboard_response_all_time = requests.get(backend_url_all_time)

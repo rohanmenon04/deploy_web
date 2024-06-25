@@ -70,6 +70,13 @@ def serve_per_stats():
         response = requests.get(backend_url)
         response.raise_for_status()  # Raise an exception for HTTP errors
         data = response.json()
+        
+        # Check if data is empty and set up a default if necessary
+        if not data["labels"] and not data["values"]:
+            data = {
+                "labels": [],
+                "values": []
+            }
         return render_template('per-stats.html', chart_data=data)
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error fetching graph data: {e}")

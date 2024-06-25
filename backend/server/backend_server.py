@@ -174,7 +174,11 @@ def get_top_scores():
     try:
         top_scores = extract_top_scores()
         if not top_scores:
-            return jsonify({"error": "No data found"}), 404
+            chart_data = {
+                "labels": [],
+                "values": []
+            }
+            return jsonify(chart_data)
 
         labels = [cleaning_dates(score['time']) for score in top_scores]
         values = [score['score'] for score in top_scores]

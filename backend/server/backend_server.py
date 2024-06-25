@@ -39,6 +39,8 @@ def change_to_datetime(date:str)->datetime:
     return date_obj
 
 OPENAI_KEY = os.getenv('OPENAI_KEY')
+if not OPENAI_KEY:
+    raise ValueError("No OPENAI AI API Key Found")
 API_URL = 'https://api.openai.com/v1/chat/completions'
 
 headers = {

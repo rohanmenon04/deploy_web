@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         appendMessage('user', message);
 
-        fetch('/api/chat', {
+        fetch('https://backend-service-fag8.onrender.com/api/chat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

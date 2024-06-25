@@ -106,5 +106,6 @@ def proxy_delete_score():
     # Return the backend response to the frontend
     return make_response(response.content, response.status_code)
 
+port = int(os.environ.get('PORT', 5000))
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, ssl_context=context)
+    app.run(host='0.0.0.0', port=port, ssl_context=context)

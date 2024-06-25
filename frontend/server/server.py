@@ -65,9 +65,18 @@ def serve_pl_guide():
 @app.route('/per-stats')
 def serve_per_stats():
     backend_url = 'https://backend-service-fag8.onrender.com/api/get-graph-data'
-    response = requests.get(backend_url)
-    data = response.json()
-    return render_template('per-stats.html', chart_data=data)
+    
+    try:
+        response = requests.get(backend_url)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        data = response.json()
+        return render_template('per-stats.html', chart_data=data)
+    except requests.exceptions.RequestException as e:
+        app.logger.error(f"Error fetching graph data: {e}")
+        return str(e), 500
+    except json.JSONDecodeError as e:
+        app.logger.error(f"Error decoding JSON: {e}")
+        return "Error decoding JSON response from backend.", 500
 
 # Route to serve the game
 @app.route('/play')

@@ -64,7 +64,7 @@ def serve_pl_guide():
 
 @app.route('/per-stats')
 def serve_per_stats():
-    backend_url = 'http://backend-service-fag8.onrender.com/api/get-graph-data'
+    backend_url = 'https://backend-service-fag8.onrender.com/api/get-graph-data'
     response = requests.get(backend_url)
     data = response.json()
     return render_template('per-stats.html', chart_data=data)
@@ -76,13 +76,13 @@ def serve_game():
 
 @app.route('/api/chat', methods=['POST'])
 def proxy_chat():
-    backend_url = 'http://backend-service-fag8.onrender.com/api/chat'
+    backend_url = 'https://backend-service-fag8.onrender.com/api/chat'
     response = requests.post(backend_url, json=request.json)
     return (response.content, response.status_code, response.headers.items())
 
 @app.route('/save_playerdata', methods=['POST'])
 def proxy_save_playerdata():
-    backend_url = 'http://backend-service-fag8.onrender.com/save_playerdata'  # Change to the correct URL and port of your backend server
+    backend_url = 'https://backend-service-fag8.onrender.com/save_playerdata'  # Change to the correct URL and port of your backend server
     try:
         # Forward the request to the backend server
         response = requests.post(backend_url, json=request.get_json())
@@ -98,7 +98,7 @@ def proxy_delete_score():
     if not score_to_delete:
         return jsonify({"error": "No score provided"}), 400
     
-    backend_url = 'http://backend-service-fag8.onrender.com/api/delete-score'  # Replace with your backend URL
+    backend_url = 'https://backend-service-fag8.onrender.com/api/delete-score'  # Replace with your backend URL
 
     # Forward the request to the backend
     response = requests.post(backend_url, json={'score': score_to_delete})

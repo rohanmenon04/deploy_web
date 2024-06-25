@@ -9,6 +9,10 @@ import matplotlib.pyplot as plt
 import io
 
 app = Flask(__name__)
+CORS(app)
+
+# In-memory data store
+player_data = []
 
 def date_suffix(day:int)->str:
     if 4 <= day <= 20 or 24 <= day <= 30:
@@ -33,8 +37,6 @@ def change_to_datetime(date:str)->datetime:
     input_format = "%m/%d/%Y %I:%M:%S %p"
     date_obj = datetime.datetime.strptime(date, input_format)
     return date_obj
-
-CORS(app)
 
 OPENAI_KEY = "sk-proj-cTcXB9cLRgB3LlOBehzPT3BlbkFJ9gVoUpaJ7hhmdJZ4V202"
 API_URL = 'https://api.openai.com/v1/chat/completions'
@@ -116,37 +118,17 @@ def chat():
 
 @app.route('/save_playerdata', methods=['POST'])
 def save_playerdata():
-    player_data_path = 'playerdata.json'
     data = request.get_json()
     time = datetime.datetime.now().isoformat()
     try:
         requests.get(f"http://dreamlo.com/lb/LhmhwO4BDUmmx1c6mpVcJQaIOAKMEaV0ydc-7N3WQrow/add/{data['username']}/{data['score']}")
     except:
         data['time'] = time
-
-        if not os.path.exists(player_data_path):
-            with open(player_data_path, 'w') as file:
-                json.dump([data], file, indent=2)
-        else:
-            with open(player_data_path, 'r') as file:
-                playerdata = json.load(file)
-            playerdata.append(data)
-            with open(player_data_path, 'w') as file:
-                json.dump(playerdata, file, indent=2)
-
+        player_data.append(data)
         return jsonify({"message": "Data saved successfully, to json but not sent to Dreamlo"}), 200
 
     data['time'] = time
-
-    if not os.path.exists(player_data_path):
-        with open(player_data_path, 'w') as file:
-            json.dump([data], file, indent=2)
-    else:
-        with open(player_data_path, 'r') as file:
-            playerdata = json.load(file)
-        playerdata.append(data)
-        with open(player_data_path, 'w') as file:
-            json.dump(playerdata, file, indent=2)
+    player_data.append(data)
 
     return jsonify({"message": "Data saved successfully"}), 200
 
@@ -174,21 +156,8 @@ def get_24h_leaderboard():
 
 @app.route('/api/get-graph-data', methods=['GET'])
 def get_top_scores():
-    def extract_top_scores(input_filename):
-        def read_json(filename):
-            try:
-                with open(filename, 'r') as file:
-                    data = json.load(file)
-                return data
-            except FileNotFoundError:
-                app.logger.error(f"File {filename} not found.")
-                return []
-            except json.JSONDecodeError:
-                app.logger.error(f"Error decoding JSON from {filename}.")
-                return []
-
-        scores = read_json(input_filename)
-        top_scores = sorted(scores, key=lambda x: x['score'], reverse=True)
+    def extract_top_scores():
+        top_scores = sorted(player_data, key=lambda x: x['score'], reverse=True)
         return top_scores
 
     def cleaning_dates(INP):
@@ -203,7 +172,7 @@ def get_top_scores():
             return INP
 
     try:
-        top_scores = extract_top_scores('playerdata.json')
+        top_scores = extract_top_scores()
         if not top_scores:
             return jsonify({"error": "No data found"}), 404
 
@@ -219,25 +188,8 @@ def get_top_scores():
         return jsonify({"error": "Internal Server Error"}), 500
 
 def delete_from_playerdata(score_to_delete):
-    player_data_path = 'playerdata.json'
-
-    def read_json(filename):
-        with open(filename, 'r') as file:
-            data = json.load(file)
-        return data
-
-    def write_json(data, filename):
-        with open(filename, 'w') as file:
-            json.dump(data, file, indent=2)
-
-    playerdata = read_json(player_data_path)
-
-    for i, entry in enumerate(playerdata):
-        if entry['score'] == int(score_to_delete):
-            del playerdata[i]
-            break
-
-    write_json(playerdata, player_data_path)
+    global player_data
+    player_data = [entry for entry in player_data if entry['score'] != int(score_to_delete)]
 
 @app.route('/api/delete-score', methods=['POST'])
 def delete_score():

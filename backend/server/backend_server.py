@@ -38,6 +38,7 @@ def change_to_datetime(date:str)->datetime:
     date_obj = datetime.datetime.strptime(date, input_format)
     return date_obj
 
+OPENAI_KEY = os.getenv('OPENAI_KEY')
 API_URL = 'https://api.openai.com/v1/chat/completions'
 
 headers = {

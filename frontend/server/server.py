@@ -50,7 +50,7 @@ def serve_leaderboard():
     try:
         leaderboard_response_all_time = requests.get(backend_url_all_time)
         leaderboard_data_all_time = leaderboard_response_all_time.json()
-        
+        time.sleep(1.05)
         leaderboard_response_24h = requests.get(backend_url_24h)
         leaderboard_data_24h = leaderboard_response_24h.json()
         

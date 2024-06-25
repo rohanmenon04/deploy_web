@@ -176,31 +176,47 @@ def get_24h_leaderboard():
 def get_top_scores():
     def extract_top_scores(input_filename):
         def read_json(filename):
-            with open(filename, 'r') as file:
-                data = json.load(file)
-            return data
+            try:
+                with open(filename, 'r') as file:
+                    data = json.load(file)
+                return data
+            except FileNotFoundError:
+                app.logger.error(f"File {filename} not found.")
+                return []
+            except json.JSONDecodeError:
+                app.logger.error(f"Error decoding JSON from {filename}.")
+                return []
 
         scores = read_json(input_filename)
         top_scores = sorted(scores, key=lambda x: x['score'], reverse=True)
-
         return top_scores
 
     def cleaning_dates(INP):
         input_format = "%Y-%m-%dT%H:%M:%S.%f"
         output_format = "%d/%m/%Y %H:%M"
-        date_obj = datetime.datetime.strptime(INP, input_format)
-        formatted_date = date_obj.strftime(output_format)
-        return formatted_date
+        try:
+            date_obj = datetime.datetime.strptime(INP, input_format)
+            formatted_date = date_obj.strftime(output_format)
+            return formatted_date
+        except ValueError as e:
+            app.logger.error(f"Error formatting date {INP}: {e}")
+            return INP
 
-    top_scores = extract_top_scores('playerdata.json')
+    try:
+        top_scores = extract_top_scores('playerdata.json')
+        if not top_scores:
+            return jsonify({"error": "No data found"}), 404
 
-    labels = [cleaning_dates(score['time']) for score in top_scores]
-    values = [score['score'] for score in top_scores]
-    chart_data = {
-        "labels": labels,
-        "values": values
-    }
-    return chart_data
+        labels = [cleaning_dates(score['time']) for score in top_scores]
+        values = [score['score'] for score in top_scores]
+        chart_data = {
+            "labels": labels,
+            "values": values
+        }
+        return jsonify(chart_data)
+    except Exception as e:
+        app.logger.error(f"Error in /api/get-graph-data: {e}")
+        return jsonify({"error": "Internal Server Error"}), 500
 
 def delete_from_playerdata(score_to_delete):
     player_data_path = 'playerdata.json'

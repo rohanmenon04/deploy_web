@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify, send_file, render_template
+from flask import Flask, request, jsonify, send_file, render_template, session
 from flask_cors import CORS
+from flask_session import Session
 import os
 import json
 import requests
@@ -9,7 +10,17 @@ import matplotlib.pyplot as plt
 import io
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # Set a secret key for session management
 CORS(app)
+
+# Configure Flask-Session
+app.config['SESSION_TYPE'] = 'filesystem'  # Store sessions in the filesystem
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_USE_SIGNER'] = True  # To protect the cookie from being tampered
+app.config['SESSION_KEY_PREFIX'] = 'myapp_'
+
+# Initialize the session
+Session(app)
 
 # In-memory data store
 player_data = {}

@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file, render_template
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import os
 import json
@@ -11,8 +11,8 @@ import io
 app = Flask(__name__)
 CORS(app)
 
-# In-memory data store
-player_data = []
+# In-memory data store with player identifiers
+player_data = {}
 
 def date_suffix(day:int)->str:
     if 4 <= day <= 20 or 24 <= day <= 30:
@@ -40,7 +40,7 @@ def change_to_datetime(date:str)->datetime:
 
 OPENAI_KEY = os.getenv('OPENAI_KEY')
 if not OPENAI_KEY:
-    raise ValueError("No OPENAI AI API Key Found")
+    raise ValueError("No OpenAI API Key Found")
 API_URL = 'https://api.openai.com/v1/chat/completions'
 
 headers = {
@@ -121,16 +121,22 @@ def chat():
 @app.route('/save_playerdata', methods=['POST'])
 def save_playerdata():
     data = request.get_json()
-    time = datetime.datetime.now().isoformat()
-    try:
-        requests.get(f"http://dreamlo.com/lb/LhmhwO4BDUmmx1c6mpVcJQaIOAKMEaV0ydc-7N3WQrow/add/{data['username']}/{data['score']}")
-    except:
-        data['time'] = time
-        player_data.append(data)
-        return jsonify({"message": "Data saved successfully, to json but not sent to Dreamlo"}), 200
+    username = data.get('username')
+    if not username:
+        return jsonify({"error": "Username is required"}), 400
 
+    time = datetime.datetime.now().isoformat()
     data['time'] = time
-    player_data.append(data)
+
+    if username not in player_data:
+        player_data[username] = []
+
+    player_data[username].append(data)
+
+    try:
+        requests.get(f"http://dreamlo.com/lb/LhmhwO4BDUmmx1c6mpVcJQaIOAKMEaV0ydc-7N3WQrow/add/{username}/{data['score']}")
+    except:
+        pass
 
     return jsonify({"message": "Data saved successfully"}), 200
 

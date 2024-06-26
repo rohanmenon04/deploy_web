@@ -54,12 +54,9 @@ document.addEventListener('DOMContentLoaded', function() {
     var chatInput = document.getElementById('chat-input');
     var chatBody = document.getElementById('chatbox-body');
 
-    function appendMessage(sender, message, isInitial = false) {
+    function appendMessage(sender, message) {
         var messageDiv = document.createElement('div');
         messageDiv.className = 'chat-message ' + sender;
-        if (isInitial) {
-            messageDiv.id = 'initial-message';
-        }
         messageDiv.innerHTML = `<strong>${sender === 'user' ? 'You' : 'Bot'}:</strong> ${message}`;
         chatBody.appendChild(messageDiv);
         chatBody.appendChild(document.createElement('br')); // Add an empty line between messages
@@ -161,6 +158,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initial friendly bot message
     if (!document.getElementById('initial-message')) {
-        appendMessage('bot', 'Hello! I am here to help you. Feel free to ask me any questions.', true);
+        appendMessage('bot', 'Hello! I am here to help you. Feel free to ask me any questions.');
     }
 });

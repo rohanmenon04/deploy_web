@@ -75,11 +75,7 @@ def serve_pl_guide():
 
 @app.route('/per-stats')
 def serve_per_stats():
-    username = session.get('username')  # Retrieve the username from the session
-    if not username:
-        return "Username not found in session", 400
-    
-    backend_url = f'https://backend-service-fag8.onrender.com/api/get-graph-data?username={username}'
+    backend_url = 'https://backend-service-fag8.onrender.com/api/get-graph-data'
     
     try:
         response = requests.get(backend_url)
@@ -114,9 +110,8 @@ def proxy_chat():
 @app.route('/save_playerdata', methods=['POST'])
 def proxy_save_playerdata():
     data = request.get_json()
-    username = data.get('username')
-    if username:
-        session['username'] = username  # Store the username in the session
+    if 'username' in data:
+        session['username'] = data['username']  # Store the username in the session
 
     backend_url = 'https://backend-service-fag8.onrender.com/save_playerdata'  # Change to the correct URL and port of your backend server
     try:
@@ -130,15 +125,14 @@ def proxy_save_playerdata():
 def proxy_delete_score():
     data = request.json
     score_to_delete = data.get('score')
-    username = session.get('username')  # Retrieve the username from the session
     
-    if not score_to_delete or not username:
-        return jsonify({"error": "No score or username provided"}), 400
+    if not score_to_delete:
+        return jsonify({"error": "No score provided"}), 400
     
     backend_url = 'https://backend-service-fag8.onrender.com/api/delete-score'  # Replace with your backend URL
 
     # Forward the request to the backend
-    response = requests.post(backend_url, json={'score': score_to_delete, 'username': username})
+    response = requests.post(backend_url, json={'score': score_to_delete})
 
     # Return the backend response to the frontend
     return make_response(response.content, response.status_code)

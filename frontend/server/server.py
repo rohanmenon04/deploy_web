@@ -5,6 +5,7 @@ import ssl
 import os
 import time
 import requests
+import json
 
 app = Flask(__name__, template_folder='../templates', static_folder='../static_files')
 app.secret_key = 'your_secret_key'  # Set a secret key for session management
@@ -77,7 +78,12 @@ def serve_pl_guide():
 def serve_per_stats():
     username = session.get('username')  # Retrieve the username from the session
     if not username:
-        return "Username not found in session", 400
+        # Set default data if username is not found
+        data = {
+            "labels": [],
+            "values": []
+        }
+        return render_template('per-stats.html', chart_data=data)
     
     backend_url = f'https://backend-service-fag8.onrender.com/api/get-graph-data?username={username}'
     

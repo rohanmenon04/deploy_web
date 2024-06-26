@@ -29,6 +29,60 @@
             padding: 8px; /* Cell padding */
             text-align: left; /* Align text */
         }
+        .chatbox {
+            background-color: black;
+            color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 300px;
+            position: absolute;
+            bottom: 50px;
+            right: 50px;
+            transition: all 0.3s ease; /* Smooth transition for responsive design */
+        }
+        .chatbox-header {
+            background-color: #6a1b9a;
+            color: white;
+            padding: 10px;
+            border-radius: 5px 5px 0 0;
+        }
+        .chatbox-body {
+            height: 200px;
+            overflow-y: scroll;
+            padding: 10px;
+        }
+        .chatbox-footer {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+        }
+        #chat-input {
+            flex: 1;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        #send-btn {
+            background-color: #6a1b9a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        @media screen and (max-width: 600px) {
+            .flex-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .flex-item {
+                width: 90%;
+                margin-bottom: 2px;
+            }
+            .chatbox {
+                width: 80%;
+                bottom: 10px;
+                right: 10px;
+            }
+        }
     </style>
 {% endblock %}
 
@@ -79,6 +133,18 @@
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+</div>
+<div class="chatbox" id="chatbox">
+    <div class="chatbox-header">
+        Chat
+    </div>
+    <div class="chatbox-body" id="chatbox-body">
+        <!-- Chat messages will appear here -->
+    </div>
+    <div class="chatbox-footer">
+        <input type="text" id="chat-input" placeholder="Type a message...">
+        <button id="send-btn">Send</button>
     </div>
 </div>
 {% endblock %}

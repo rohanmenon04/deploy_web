@@ -9,38 +9,38 @@
         body, html {
             color: white;
             background-color: black;
-            margin: 0;
+            margin: 0 20px;
             padding: 0;
-            width: 100%;
+            width: 83%;
             height: 100%;
             overflow: hidden;
         }
         .centered-text {
             text-align: center;
             margin: 0; /* Remove bottom margin to move it up */
-            padding: 20px 0 10px 0; /* Adjust padding to move text up */
+            padding: 20px 30px; /* Adjust padding to move text up */
         }
         .flex-container {
             display: flex;
             flex-direction: row; /* Arrange children in a row */
             justify-content: space-between; /* Distribute space evenly between items */
             align-items: flex-start; /* Align items to the start */
-            padding: 20px; /* Adjust padding to move container up */
+            padding: 3px; /* Adjust padding to move container up */
             margin-top: 0; /* Remove top margin if present */
         }
         .flex-item {
             flex: 1; /* Allow items to grow and fill space */
-            margin: 0 10px; /* Consistent margin on both sides */
+            margin: 10px 10px; /* Consistent margin on both sides */
         }
         .chatbox {
-            background-color: white;
-            color: black;
+            background-color: black;
+            color: white;
             border: 1px solid #ccc;
             border-radius: 5px;
             width: 300px;
             position: absolute;
-            bottom: 20px;
-            right: 20px;
+            bottom: 50px;
+            right: 50px;
             transition: all 0.3s ease; /* Smooth transition for responsive design */
         }
         .chatbox-header {
@@ -78,7 +78,7 @@
             }
             .flex-item {
                 width: 90%;
-                margin-bottom: 20px;
+                margin-bottom: 2px;
             }
             .chatbox {
                 width: 80%;
@@ -96,18 +96,26 @@
 {% block content %}
 <div class="centered-text">
     <h1>Welcome to the Help Page</h1>
-</div>
-<div class="flex-container">
-    <div class="flex-item">
-        <p>Welcome to the game where your skills are put to the test! Your mission is to guide your character through a maze of floating lines and obstacles without making contact. Using your cursor, maneuver your character with precision and agility to avoid colliding with the spinning and moving obstacles that cross your path.
-
-            As you navigate through the maze, your goal is to survive for as long as possible. With each passing moment, the intensity of the challenge increases, presenting you with ever more intricate patterns and obstacles to overcome. Every successful dodge earns you points, and the longer you manage to stay afloat amidst the chaos, the higher your score will soar.
-            
-            But be warned, the path ahead is fraught with danger, and the slightest misstep could spell the end of your journey. Stay sharp, stay focused, and may your reflexes be swift as you strive to achieve the highest score possible. Are you ready to embark on this adrenaline-fueled adventure? The challenge awaits!</p>
-        
+    <div class="flex-container">
+        <div class="flex-item">
+            <p>Welcome to the game where your skills get tested! Guide your character through a maze of floating lines and obstacles without touching them. Use your cursor to move with precision and avoid the spinning and moving obstacles in your path.
+    
+                Your goal is to survive as long as possible. The longer you play, the tougher the challenge gets, with more complex patterns and obstacles. Every successful dodge earns you points, and the longer you last, the higher your score.
+                
+                Ready for this adrenaline-fueled adventure? The challenge awaits!</p>
+        </div>
     </div>
-    <div class="flex-item">
-        <p>Lines is a game designed by our enthusiastic team, made for the purpose of pure entertainment. The game specifically was developed by Lucas Masclee, a young, up and coming Unity game developer. The team then developed it into a web application so that you can enjoy the game on your favourite browser anywhere in the world. There is also an option to download the game at Lucas’s .io page: <a href="https://mascelli-games.itch.io/" target="_blank">https://mascelli-games.itch.io/</a>.</p>
+    <h1>FAQ</h1>
+    <div class="flex-container">
+        <div class="flex item">
+            <p>For any question regarding the game, meet our chatbot, your go-to resource for everything about the game. Whether you have questions about gameplay, need tips for navigating through levels, or want strategies to improve your skills, the chatbot is here to help. Just ask away, and get ready to conquer the game!</p>
+        </div>
+    </div>
+    <h1>About us</h1>
+    <div class="flex-container">
+        <div class="flex-item">
+            <p>Lines is a game designed by our enthusiastic team, made for the purpose of pure entertainment. The game specifically was developed by Lucas Masclee, a young, up and coming Unity game developer. The team then developed it into a web application so that you can enjoy the game on your favourite browser anywhere in the world. There is also an option to download the game at Lucas’s .io page: <a href="https://mascelli-games.itch.io/" target="_blank">https://mascelli-games.itch.io/</a>.</p>
+        </div>
     </div>
 </div>
 <div class="chatbox" id="chatbox">

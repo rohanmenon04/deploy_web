@@ -5,6 +5,7 @@ import ssl
 import os
 import time
 import requests
+import json  # Import json module
 
 app = Flask(__name__, template_folder='../templates', static_folder='../static_files')
 app.secret_key = 'your_secret_key'  # Set a secret key for session management

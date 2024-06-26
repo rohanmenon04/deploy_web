@@ -5,6 +5,7 @@ import ssl
 import os
 import time
 import requests
+import json  # Ensure json module is imported
 
 app = Flask(__name__, template_folder='../templates', static_folder='../static_files')
 app.secret_key = 'your_secret_key'  # Set a secret key for session management
@@ -81,14 +82,15 @@ def serve_per_stats():
         response = requests.get(backend_url)
         response.raise_for_status()  # Raise an exception for HTTP errors
         data = response.json()
-        
-        # Check if data is empty and set up a default if necessary
-        if not data["labels"] and not data["values"]:
-            data = {
-                "labels": [],
-                "values": []
-            }
-        return render_template('per-stats.html', chart_data=data)
+
+        # Handle list returned from backend
+        if isinstance(data, list) and len(data) == 2:
+            chart_data, leaderboard_data = data
+            if not chart_data["labels"] and not chart_data["values"]:
+                chart_data = {"labels": [], "values": []}
+            return render_template('per-stats.html', chart_data=chart_data, leaderboard_data=leaderboard_data)
+        else:
+            return "Invalid data format from backend", 500
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error fetching graph data: {e}")
         return str(e), 500

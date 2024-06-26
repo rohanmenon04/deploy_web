@@ -5,7 +5,6 @@ import ssl
 import os
 import time
 import requests
-import json  # Ensure json module is imported
 
 app = Flask(__name__, template_folder='../templates', static_folder='../static_files')
 app.secret_key = 'your_secret_key'  # Set a secret key for session management
@@ -76,21 +75,24 @@ def serve_pl_guide():
 
 @app.route('/per-stats')
 def serve_per_stats():
-    backend_url = 'https://backend-service-fag8.onrender.com/api/get-graph-data'
+    username = session.get('username')  # Retrieve the username from the session
+    if not username:
+        return "Username not found in session", 400
+    
+    backend_url = f'https://backend-service-fag8.onrender.com/api/get-graph-data?username={username}'
     
     try:
         response = requests.get(backend_url)
         response.raise_for_status()  # Raise an exception for HTTP errors
         data = response.json()
-
-        # Handle list returned from backend
-        if isinstance(data, list) and len(data) == 2:
-            chart_data, leaderboard_data = data
-            if not chart_data["labels"] and not chart_data["values"]:
-                chart_data = {"labels": [], "values": []}
-            return render_template('per-stats.html', chart_data=chart_data, leaderboard_data=leaderboard_data)
-        else:
-            return "Invalid data format from backend", 500
+        
+        # Check if data is empty and set up a default if necessary
+        if not data["labels"] and not data["values"]:
+            data = {
+                "labels": [],
+                "values": []
+            }
+        return render_template('per-stats.html', chart_data=data)
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error fetching graph data: {e}")
         return str(e), 500
@@ -112,8 +114,9 @@ def proxy_chat():
 @app.route('/save_playerdata', methods=['POST'])
 def proxy_save_playerdata():
     data = request.get_json()
-    if 'username' in data:
-        session['username'] = data['username']  # Store the username in the session
+    username = data.get('username')
+    if username:
+        session['username'] = username  # Store the username in the session
 
     backend_url = 'https://backend-service-fag8.onrender.com/save_playerdata'  # Change to the correct URL and port of your backend server
     try:
@@ -127,14 +130,15 @@ def proxy_save_playerdata():
 def proxy_delete_score():
     data = request.json
     score_to_delete = data.get('score')
+    username = session.get('username')  # Retrieve the username from the session
     
-    if not score_to_delete:
-        return jsonify({"error": "No score provided"}), 400
+    if not score_to_delete or not username:
+        return jsonify({"error": "No score or username provided"}), 400
     
     backend_url = 'https://backend-service-fag8.onrender.com/api/delete-score'  # Replace with your backend URL
 
     # Forward the request to the backend
-    response = requests.post(backend_url, json={'score': score_to_delete})
+    response = requests.post(backend_url, json={'score': score_to_delete, 'username': username})
 
     # Return the backend response to the frontend
     return make_response(response.content, response.status_code)

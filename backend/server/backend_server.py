@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file, render_template, session
+from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from flask_session import Session
 import os
@@ -7,7 +7,6 @@ import requests
 import datetime
 from datetime import timedelta
 import matplotlib.pyplot as plt
-import io
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Set a secret key for session management
@@ -48,6 +47,43 @@ def change_to_datetime(date:str)->datetime:
     input_format = "%m/%d/%Y %I:%M:%S %p"
     date_obj = datetime.datetime.strptime(date, input_format)
     return date_obj
+
+def cleaning_dates(INP):
+    input_format = "%Y-%m-%dT%H:%M:%S.%f"
+    output_format = "%d/%m/%Y %H:%M"
+    date_obj = datetime.datetime.strptime(INP, input_format)
+    formatted_date = date_obj.strftime(output_format)
+    return formatted_date
+
+def extract_top_scores(username):
+    if username not in player_data:
+        return [], []
+
+    user_scores = player_data[username]
+    recent_scores = sorted(user_scores, key=lambda x: x['time'], reverse=False)
+    top_scores = sorted(user_scores, key=lambda x: x['score'], reverse=True)
+    
+    return recent_scores, top_scores
+
+def get_chart_and_leaderboard_data(username):
+    recent_scores, top_scores = extract_top_scores(username)
+    
+    labels_chart = [cleaning_dates(score['time']) for score in top_scores]
+    labels_leaderboard = [cleaning_dates(score['time']) for score in recent_scores]
+    values_chart = [score['score'] for score in top_scores]
+    values_leaderboard = [score['score'] for score in recent_scores]
+    
+    chart_data = {
+        "labels": labels_chart,
+        "values": values_chart
+    }
+    leaderboard_data = {
+        "labels": labels_leaderboard,
+        "values": values_leaderboard
+    }
+    
+    return jsonify([chart_data, leaderboard_data])
+
 
 OPENAI_KEY = os.getenv('OPENAI_KEY')
 if not OPENAI_KEY:
@@ -173,46 +209,12 @@ def get_24h_leaderboard():
     return jsonify(leaderboard_24h)
 
 @app.route('/api/get-graph-data', methods=['GET'])
-def get_top_scores():
+def get_graph_data():
     username = request.args.get('username')
     if not username or username not in player_data:
         return jsonify({"labels": [], "values": []})
-
-    def extract_top_scores(user_scores):
-        top_scores = sorted(user_scores, key=lambda x: x['score'], reverse=True)
-        return top_scores
-
-    def cleaning_dates(INP):
-        input_format = "%Y-%m-%dT%H:%M:%S.%f"
-        output_format = "%d/%m/%Y %H:%M"
-        try:
-            date_obj = datetime.datetime.strptime(INP, input_format)
-            formatted_date = date_obj.strftime(output_format)
-            return formatted_date
-        except ValueError as e:
-            app.logger.error(f"Error formatting date {INP}: {e}")
-            return INP
-
-    try:
-        user_scores = player_data[username]
-        top_scores = extract_top_scores(user_scores)
-        if not top_scores:
-            chart_data = {
-                "labels": [],
-                "values": []
-            }
-            return jsonify(chart_data)
-
-        labels = [cleaning_dates(score['time']) for score in top_scores]
-        values = [score['score'] for score in top_scores]
-        chart_data = {
-            "labels": labels,
-            "values": values
-        }
-        return jsonify(chart_data)
-    except Exception as e:
-        app.logger.error(f"Error in /api/get-graph-data: {e}")
-        return jsonify({"error": "Internal Server Error"}), 500
+    data = get_chart_and_leaderboard_data(username)
+    return data
 
 def delete_from_playerdata(username, score_to_delete):
     if username in player_data:

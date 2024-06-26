@@ -64,60 +64,6 @@
             justify-content: space-between;
             align-items: center;
         }
-        .chatbox {
-            background-color: black;
-            color: white;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 300px;
-            position: absolute;
-            bottom: 50px;
-            right: 50px;
-            transition: all 0.3s ease; /* Smooth transition for responsive design */
-        }
-        .chatbox-header {
-            background-color: #6a1b9a;
-            color: white;
-            padding: 10px;
-            border-radius: 5px 5px 0 0;
-        }
-        .chatbox-body {
-            height: 200px;
-            overflow-y: scroll;
-            padding: 10px;
-        }
-        .chatbox-footer {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-        }
-        #chat-input {
-            flex: 1;
-            padding: 10px;
-            margin-right: 10px;
-        }
-        #send-btn {
-            background-color: #6a1b9a;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-        @media screen and (max-width: 600px) {
-            .flex-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            .flex-item {
-                width: 90%;
-                margin-bottom: 2px;
-            }
-            .chatbox {
-                width: 80%;
-                bottom: 10px;
-                right: 10px;
-            }
-        }
     </style>
 {% endblock %}
 
@@ -135,7 +81,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for score in leaderboard_data['values'][:5] %}
+                    {% for score in chart_data['values'][:5] %}
                     <tr>
                         <td>{{ loop.index }}</td> <!-- Use loop.index for numbering -->
                         <td class="flex-container">{{ score }} <button class="delete-button" onclick="deleteRow('{{ score }}')">Delete</button></td>
@@ -147,37 +93,32 @@
 
         <!-- Performance Over Last 10 Games Section -->
         <div class="partitioned-section">
-            <h2>Performance over your last games</h2>
-            <p>Your personal performance over the last couple of tries you had in the game. Never give up!:</p>
+            <h2>Performance over last 10 games</h2>
+            <p>Performance over the last 10 games:</p>
             <canvas id="performanceChart" width="400" height="200"></canvas>
         </div>
     </div>
 
-    <div class="chatbox" id="chatbox">
-    <div class="chatbox-header">
-        Chat
+    <!-- Performance comparison section -->
+    <div class="partitioned-section">
+        <h2>Performance in perspective</h2>
+        <p>Here we will show some player statistics compared to other players: for instance
+            the variance in a player's average performance, the average performance of
+            the last 10 games compared to others and more.</p>
     </div>
-    <div class="chatbox-body" id="chatbox-body">
-        <!-- Chat messages will appear here -->
-    </div>
-    <div class="chatbox-footer">
-        <input type="text" id="chat-input" placeholder="Type a message...">
-        <button id="send-btn">Send</button>
-    </div>
-</div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() { 
-            const chartData = {{ chart_data | tojson | safe }}; // retrieves chart data passed from the backend, its converted to json and marked safe for rendering
-            // Chart.js setup # Wait for img and stylesheets to be loaded as well as the html, use evenlistener to know when that happens
-            var ctx = document.getElementById('performanceChart').getContext('2d'); // returns the element context needed for the graph (canvas element)
-            var myChart = new Chart(ctx, { // Creates a Chart.js instance for rendering context with ctx
-                type: 'line', // Specifies lin chart
+        document.addEventListener('DOMContentLoaded', function() {
+            const chartData = {{ chart_data | tojson | safe }};
+            // Chart.js setup
+            var ctx = document.getElementById('performanceChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
                 data: {
-                    labels: chartData.labels,  // Use times as labels, fromt the chartData sets the x-axis as time
+                    labels: chartData.labels,  // Use times as labels
                     datasets: [{
-                        label: 'Scores',
-                        data: chartData.values,  // Use scores as data points, y- axis as scores
+                        label: 'Performance',
+                        data: chartData.values,  // Use scores as data points
                         borderColor: 'rgba(255, 255, 255, 1)', // White border color
                         backgroundColor: 'rgba(255, 255, 255, 0.2)', // White background color
                         borderWidth: 1
@@ -186,7 +127,7 @@
                 options: {
                     scales: {
                         y: {
-                            beginAtZero: true, // sets y-axis to zero
+                            beginAtZero: true,
                             ticks: {
                                 color: 'white' // Set y-axis label color to white
                             }

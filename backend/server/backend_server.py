@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, send_file, render_template
 from flask_cors import CORS
 import os
 import json
@@ -11,7 +11,7 @@ import io
 app = Flask(__name__)
 CORS(app)
 
-# In-memory data store with player identifiers
+# In-memory data store
 player_data = {}
 
 def date_suffix(day:int)->str:
@@ -121,22 +121,21 @@ def chat():
 @app.route('/save_playerdata', methods=['POST'])
 def save_playerdata():
     data = request.get_json()
-    username = data.get('username')
-    if not username:
-        return jsonify({"error": "Username is required"}), 400
-
     time = datetime.datetime.now().isoformat()
+    username = data['username']
     data['time'] = time
-
-    if username not in player_data:
-        player_data[username] = []
-
-    player_data[username].append(data)
 
     try:
         requests.get(f"http://dreamlo.com/lb/LhmhwO4BDUmmx1c6mpVcJQaIOAKMEaV0ydc-7N3WQrow/add/{username}/{data['score']}")
     except:
-        pass
+        if username not in player_data:
+            player_data[username] = []
+        player_data[username].append(data)
+        return jsonify({"message": "Data saved successfully, to json but not sent to Dreamlo"}), 200
+
+    if username not in player_data:
+        player_data[username] = []
+    player_data[username].append(data)
 
     return jsonify({"message": "Data saved successfully"}), 200
 
@@ -164,8 +163,12 @@ def get_24h_leaderboard():
 
 @app.route('/api/get-graph-data', methods=['GET'])
 def get_top_scores():
-    def extract_top_scores():
-        top_scores = sorted(player_data, key=lambda x: x['score'], reverse=True)
+    username = request.args.get('username')
+    if not username or username not in player_data:
+        return jsonify({"labels": [], "values": []})
+
+    def extract_top_scores(user_scores):
+        top_scores = sorted(user_scores, key=lambda x: x['score'], reverse=True)
         return top_scores
 
     def cleaning_dates(INP):
@@ -180,7 +183,8 @@ def get_top_scores():
             return INP
 
     try:
-        top_scores = extract_top_scores()
+        user_scores = player_data[username]
+        top_scores = extract_top_scores(user_scores)
         if not top_scores:
             chart_data = {
                 "labels": [],
@@ -199,19 +203,20 @@ def get_top_scores():
         app.logger.error(f"Error in /api/get-graph-data: {e}")
         return jsonify({"error": "Internal Server Error"}), 500
 
-def delete_from_playerdata(score_to_delete):
-    global player_data
-    player_data = [entry for entry in player_data if entry['score'] != int(score_to_delete)]
+def delete_from_playerdata(username, score_to_delete):
+    if username in player_data:
+        player_data[username] = [entry for entry in player_data[username] if entry['score'] != int(score_to_delete)]
 
 @app.route('/api/delete-score', methods=['POST'])
 def delete_score():
     data = request.json
     score_to_delete = data.get('score')
+    username = data.get('username')
 
-    if not score_to_delete:
-        return jsonify({"error": "No score provided"}), 400
+    if not score_to_delete or not username:
+        return jsonify({"error": "No score or username provided"}), 400
 
-    delete_from_playerdata(score_to_delete)
+    delete_from_playerdata(username, score_to_delete)
 
     return jsonify({"message": "Score deleted successfully"}), 200
 

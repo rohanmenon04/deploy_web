@@ -4,6 +4,9 @@ from flask_session import Session
 import os
 import json
 import requests
+import datetime
+from datetime import timedelta
+import matplotlib.pyplot as plt
 import io
 
 app = Flask(__name__)
@@ -22,13 +25,13 @@ Session(app)
 # In-memory data store
 player_data = {}
 
-def date_suffix(day: int) -> str:
+def date_suffix(day:int)->str:
     if 4 <= day <= 20 or 24 <= day <= 30:
         return "th"
     else:
         return ["st", "nd", "rd"][day % 10 - 1]
 
-def format_date(date: str) -> str:
+def format_date(date:str) -> str:
     date_parts = date.split()
     month, day, year = date_parts[0].split('/')
     hour, minute, second = date_parts[1].split(':')
@@ -41,21 +44,10 @@ def format_date(date: str) -> str:
         format = f"%d{date_suffix(int(day))} %B %Y"
     return date.strftime(format)
 
-def change_to_datetime(date: str) -> datetime:
+def change_to_datetime(date:str)->datetime:
     input_format = "%m/%d/%Y %I:%M:%S %p"
     date_obj = datetime.datetime.strptime(date, input_format)
     return date_obj
-
-def cleaning_dates(INP):
-    input_format = "%Y-%m-%dT%H:%M:%S.%f"
-    output_format = "%d/%m/%Y %H:%M"
-    date_obj = datetime.datetime.strptime(INP, input_format)
-    formatted_date = date_obj.strftime(output_format)
-    return formatted_date
-
-def extract_top_scores(user_scores):
-    top_scores = sorted(user_scores, key=lambda x: x['score'], reverse=True)
-    return top_scores
 
 OPENAI_KEY = os.getenv('OPENAI_KEY')
 if not OPENAI_KEY:
@@ -150,13 +142,11 @@ def save_playerdata():
         if username not in player_data:
             player_data[username] = []
         player_data[username].append(data)
-        session['player_data'] = player_data
-        return jsonify({"message": "Data saved successfully, to session but not sent to Dreamlo"}), 200
+        return jsonify({"message": "Data saved successfully, to json but not sent to Dreamlo"}), 200
 
     if username not in player_data:
         player_data[username] = []
     player_data[username].append(data)
-    session['player_data'] = player_data
 
     return jsonify({"message": "Data saved successfully"}), 200
 
@@ -185,9 +175,23 @@ def get_24h_leaderboard():
 @app.route('/api/get-graph-data', methods=['GET'])
 def get_top_scores():
     username = request.args.get('username')
-    player_data = session.get('player_data', {})
     if not username or username not in player_data:
         return jsonify({"labels": [], "values": []})
+
+    def extract_top_scores(user_scores):
+        top_scores = sorted(user_scores, key=lambda x: x['score'], reverse=True)
+        return top_scores
+
+    def cleaning_dates(INP):
+        input_format = "%Y-%m-%dT%H:%M:%S.%f"
+        output_format = "%d/%m/%Y %H:%M"
+        try:
+            date_obj = datetime.datetime.strptime(INP, input_format)
+            formatted_date = date_obj.strftime(output_format)
+            return formatted_date
+        except ValueError as e:
+            app.logger.error(f"Error formatting date {INP}: {e}")
+            return INP
 
     try:
         user_scores = player_data[username]
@@ -213,7 +217,6 @@ def get_top_scores():
 def delete_from_playerdata(username, score_to_delete):
     if username in player_data:
         player_data[username] = [entry for entry in player_data[username] if entry['score'] != int(score_to_delete)]
-    session['player_data'] = player_data
 
 @app.route('/api/delete-score', methods=['POST'])
 def delete_score():

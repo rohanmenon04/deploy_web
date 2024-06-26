@@ -165,11 +165,13 @@ def save_playerdata():
         if 'player_data' not in session:
             session['player_data'] = []
         session['player_data'].append(data)
+        session.modified = True
         return jsonify({"message": "Data saved successfully, to session but not sent to Dreamlo"}), 200
 
     if 'player_data' not in session:
         session['player_data'] = []
     session['player_data'].append(data)
+    session.modified = True
 
     return jsonify({"message": "Data saved successfully"}), 200
 
@@ -203,6 +205,7 @@ def get_graph_data():
 def delete_from_playerdata(score_to_delete):
     if 'player_data' in session:
         session['player_data'] = [entry for entry in session['player_data'] if entry['score'] != int(score_to_delete)]
+        session.modified = True
 
 @app.route('/api/delete-score', methods=['POST'])
 def delete_score():
